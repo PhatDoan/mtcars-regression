@@ -1,0 +1,70 @@
+---
+title: "Car Transmission Analysis"
+author: "Phat Doan"
+date: "Sunday, May 24, 2015"
+output: pdf_document
+---
+
+## Executive Summary
+This analysis was performed on Motor Trend Cars data to determine whether there is a significant difference of miles/gallon (mpg) between automatic and manual transmission cars. 
+
+We found that transmission may play a role in car milage. Manual transmission cars are 2.936 mpg higher on average than the automatic cars, all else being equal.
+
+## Exploratory Data Analysis
+Box-plotting the mpg for each transmission type reveals that there seems to be a difference in the distribution of *mpg* for each type of *transmission*. The correlation matrix (see Appendix - Fig 1) shows that there is a relationship of **+0.6** between *transmission* and *mpg*, meaning manual cars have higher mpg than automatic ones.
+
+```{r,include=FALSE}
+require(corrplot)
+```
+
+```{r,fig.height=3.5,fig.width=2.8}
+par(mar = c(2, 4, 1, 1))
+boxplot(mpg ~ am, data = mtcars, xlab = "Tranmission Type", 
+        ylab = "Miles/Gallon", col = c("royalblue", "salmon2"), 
+        names = c("Automatic", "Manual"))
+```
+
+\pagebreak
+
+## Regression Models
+A model with all the available variables is built and we then examine the p-values of the regressors:
+```{r}
+fit_all <- lm(mpg ~ ., data = mtcars)
+summary(fit_all)$coef
+```
+
+Because no variable is significant at 95% confidence, we deploy **backward elimination** - removing insignificant variables until only significant variables are left in the model. 
+```{r, echo=TRUE,results='hide'}
+step(fit_all, direction = "backward", test = "F")
+```
+The resulted model is **mpg ~ wt + qsec + am**
+```{r}
+fit <- lm(formula = mpg ~ wt + qsec + am, data = mtcars)
+summary(fit)$coef
+```
+It can be inferred from the above table that a) Transmission type is significant in explaining mpg and b) Manual transmission cars are 2.936 mpg higher on average than the automatic cars, all else being equal.
+
+## Model Residual Plot & Diagnosis
+A residual plot and other diagnosis plots are done. In the residual plot (Appendix - Fig 2), the residuals are not randomly scattered but follow a curve, suggesting that there might be important cofounding variables that were not taken into account. The Q-Q plot show that data is somewhat normal.
+
+
+\pagebreak
+
+## Appendix
+
+### Fig 1 - Correlation Matrix
+
+```{r,echo=FALSE,fig.height=7,fig.width=7}
+par(mar = c(.5, .5, .5, .5))
+corrplot(cor(mtcars), method = "number")
+```
+
+\pagebreak
+
+### Fig 2 - Diagnosis Plots
+
+```{r,echo=FALSE,fig.height=7,fig.width=7}
+par(mfrow = c(2, 2))
+plot(fit)
+```
+
