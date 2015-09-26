@@ -1,7 +1,7 @@
 ---
 title: "Car Transmission Analysis"
-author: "Phat Doan"
-date: "Sunday, May 24, 2015"
+author: "Phat Q. Doan"
+date: "Saturday, September 26, 2015"
 output: pdf_document
 ---
 
@@ -35,8 +35,12 @@ summary(fit_all)$coef
 
 Because no variable is significant at 95% confidence, we deploy **backward elimination** - removing insignificant variables until only significant variables are left in the model. 
 ```{r, echo=TRUE,results='hide'}
-step(fit_all, direction = "backward", test = "F")
+res <- step(fit_all, direction = "backward", test = "F")
 ```
+```{r}
+res$call
+```
+
 The resulted model is **mpg ~ wt + qsec + am**
 ```{r}
 fit <- lm(formula = mpg ~ wt + qsec + am, data = mtcars)
